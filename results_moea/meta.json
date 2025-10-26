@@ -1,0 +1,79 @@
+[
+  {
+    "problem_id": 2100,
+    "n": 450,
+    "csv_summary": "results_moea\\2100_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2100_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  },
+  {
+    "problem_id": 2101,
+    "n": 450,
+    "csv_summary": "results_moea\\2101_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2101_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  },
+  {
+    "problem_id": 2102,
+    "n": 595,
+    "csv_summary": "results_moea\\2102_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2102_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  },
+  {
+    "problem_id": 2103,
+    "n": 760,
+    "csv_summary": "results_moea\\2103_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2103_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  },
+  {
+    "problem_id": 2200,
+    "n": 4039,
+    "csv_summary": "results_moea\\2200_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2200_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  },
+  {
+    "problem_id": 2201,
+    "n": 4039,
+    "csv_summary": "results_moea\\2201_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2201_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  },
+  {
+    "problem_id": 2202,
+    "n": 4039,
+    "csv_summary": "results_moea\\2202_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2202_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  },
+  {
+    "problem_id": 2203,
+    "n": 4039,
+    "csv_summary": "results_moea\\2203_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2203_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  },
+  {
+    "problem_id": 2300,
+    "n": 279,
+    "csv_summary": "results_moea\\2300_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2300_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  },
+  {
+    "problem_id": 2301,
+    "n": 1395,
+    "csv_summary": "results_moea\\2301_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2301_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  },
+  {
+    "problem_id": 2302,
+    "n": 2790,
+    "csv_summary": "results_moea\\2302_GSEMO_fixed_budget.csv",
+    "tradeoff_csv_first_run": "results_moea\\2302_GSEMO_tradeoff_first_run.csv",
+    "ioh_dir": "results_moea\\ioh_data"
+  }
+]
