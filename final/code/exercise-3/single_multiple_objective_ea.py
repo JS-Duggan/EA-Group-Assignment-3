@@ -2,18 +2,32 @@ from ioh import get_problem, ProblemClass
 from ioh import logger
 import sys
 import numpy as np
+import random
 
-def single_objective(fitness, population_size):
+def bit_flip_mutation(x, prob = 0.01):
+    for i in range(len(x)):
+        if random.random() < prob:
+            x[i] = 1 - x[i]
+    return x
+
+def single_objective(fitness, population_size, budget):
     # Initialisation
     # array of size population_size that has an unknown k amount of elements that are included in each individual
     population = [np.random.randint(2, size = fitness.meta_data.n_variables) for _ in range(population_size)]
+    #population = [[1 for _ in range(fitness.meta_data.n_variables)] for _ in range(population_size)]
 
-    pop_fitness = [-fitness(x) for x in population]
+    pop_fitness = [fitness(x) for x in population]
+    print(pop_fitness[1])
     best_index = int(np.argmax(pop_fitness))
     best_solution = population[best_index]
     best_fitness = pop_fitness[best_index]
 
-    
+    # Loop
+    evaluations = population_size
+    while evaluations < budget: # and best_fitness < fitness.optimum.y:
+
+
+        evaluations += 1
 
     return best_solution, best_fitness
 
@@ -37,7 +51,7 @@ def run_single_objective():
         prob.attach_logger(l)
         max = 0
         for r in range(1):
-            res1, res2 = single_objective(prob, 50)
+            res1, res2 = single_objective(prob, 50, 10000)
             if res2 > max:
                 max = res2
         print(max)
@@ -65,5 +79,11 @@ def run_multi_objective():
     return 1
 
 if __name__ == "__main__":
-    run_single_objective()
+    #run_single_objective()
+    om = get_problem(fid = 2100, dimension=50, instance=1, problem_class = ProblemClass.GRAPH)
 
+    fitness = -1
+    while fitness <= 0:
+        x = np.random.randint(2, size = om.meta_data.n_variables)
+        fitness = om(x)
+    print(fitness)
