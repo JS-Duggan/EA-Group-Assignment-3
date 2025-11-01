@@ -1,30 +1,13 @@
 from ioh import get_problem, ProblemClass
 from ioh import logger
-import sys
 import numpy as np
 import random
-import math
+import time
 
 
-
-def bit_flip_mutation(x, prob = 0.01):
-    for i in range(len(x)):
-        if random.random() < prob:
-            x[i] = 1 - x[i]
-    return x
-
-def generate_population(population_size, gene_size, fitness):
-    population = [[0 for _ in range(gene_size)] for _ in range(population_size)]
-
-    for pop in population:
-        # Generate only genes that have valid results
-        res = 0
-        temp = pop
-        while (res <= 0):
-            temp = bit_flip_mutation(pop, 0.001)
-            res = fitness(temp)
-        pop = temp
-
+def generate_population(population_size, gene_size):
+    population = np.zeros((population_size, gene_size), dtype=np.uint8)
+    mutation(population, 0.001)
     return population
 
 def selection(population, fitness):
@@ -32,80 +15,125 @@ def selection(population, fitness):
     # Select parents based on 1/n probability scaled based on fitness value
     # There is 0% chance of selecting invalid entires
 
-    fitness_results = [fitness(x) for x in population]
+    fitness_results = np.array(fitness(population), dtype=float)
     max_index = int(np.argmax(fitness_results))
-    max_fitness = fitness_results[max_index]
+    max_fitness_inverse = 1/fitness_results[max_index]
 
-    # Grantee that the best survives
-    new_population = [(population[max_index])]
+    # Selects from the population with probbility based on fitness
+    # Grantees that the best survives
+    return population[np.random.rand(len(population)) < (fitness_results) * max_fitness_inverse], population[max_index]
 
-    #print("test")
-    #print(len(new_population))
-    #print(len(new_population[0]))
+def selection_multi(population, fitness):
 
-    for i in range(len(population)):
-        if (random.random() < fitness_results[i] / max_fitness):
-            new_population.append(population[i])
+    fitness_results = np.array(fitness(population), dtype=float)
 
-    return new_population
+    ranks = np.zeros(len(population), dtype=int)
+    unranked = np.arange(len(population), dtype=int)
+
+    rank = 1
+    while (unranked.size > 0):
+        undominated = []
+        for pop in unranked:
+            dominated = False
+            for pop2 in unranked:
+                if (pop == pop2):
+                    break
+                if (fitness_results[pop2] >  fitness_results[pop] and len(population[pop2]) <= len(population[pop]) or 
+                    fitness_results[pop2] >= fitness_results[pop] and len(population[pop2]) <  len(population[pop]) ):
+                    dominated = True
+                    break
+            
+            # It is at this rank if it has remained undominated
+            if not dominated:
+                undominated.append(pop)
+
+        # Update ranks and unranked list
+        ranks[undominated] = rank
+        rank += 1
+        unranked = np.setdiff1d(unranked, undominated)
+
+    # Selection based on probability 1/rank
+    return population[np.random.rand(len(population)) < 1/ranks]
 
 def reproduction(parents, population_size):
 
     # Reproduce through random parent selection, slpit at random point and generate 2 children
-
-    population = []
     gene_size = len(parents[0])
     parent_size = len(parents)
+    population = np.empty((population_size, gene_size), dtype=np.uint8)
 
-    for _ in range(math.floor(population_size/2)):
+    for i in range(0, population_size-1, 2):
         p1 = parents[random.randint(0, parent_size-1)]
         p2 = parents[random.randint(0, parent_size-1)]
         swapIndex = random.randint(0, gene_size-1)
-        population.append( p1[:swapIndex] + p2[swapIndex:])
-        population.append( p2[:swapIndex] + p1[swapIndex:])
+        population[i] = np.concatenate((p1[:swapIndex], p2[swapIndex:]))
+        population[i+1] = np.concatenate((p2[:swapIndex], p1[swapIndex:]))
 
-    # Add the best to stay around
-    # assumes the first parent is the best, keep this
-    if population_size % 2 == 0:
-        # Even popultion which is filled above, replace the first one
-        population[0] = parents[0] 
-    else:
-        # Odd population so append the last required population to be the best
-        population.insert(0, parents[0])
+    if population_size % 2 != 0:
+        p1 = parents[random.randint(0, parent_size-1)]
+        p2 = parents[random.randint(0, parent_size-1)]
+        swapIndex = random.randint(0, gene_size-1)
+        population[population_size-1] = np.concatenate((p1[:swapIndex], p2[swapIndex:]))
+
     return population
 
-def mutation(population): 
-    # Run bit flipping on all population
-    # Keep the best untouched
-    result = [bit_flip_mutation(pop, 0.001) for pop in population[1:]]
-    result.append(population[0])
-    return result
+def mutation(population, prob = 0.001): 
+    mask = (np.random.rand(*population.shape) < prob)
+    population[mask] = 1-population[mask]
 
 def single_objective(fitness, population_size, budget):
     # Initialisation
     # array of size population_size that has an unknown k amount of elements that are included in each individual
-    population = generate_population(population_size, fitness.meta_data.n_variables, fitness)
-    #[np.random.randint(2, size = fitness.meta_data.n_variables) for _ in range(population_size)]
+    population = generate_population(population_size, fitness.meta_data.n_variables)
 
     # Loop
     evaluations = 0
     while evaluations < budget:
         
         # Selection
-        parents = selection(population, fitness)
+        parents, max_parent = selection(population, fitness)
+        evaluations += len(population)
+
+        # Reproduction
+        population = reproduction(parents, population_size-1)
+        population = np.vstack([population, max_parent])
+
+
+        # Mutation
+        mutation(population, 0.0001)
+
+    # Find the best combination
+    #pop_fitness = [fitness(x) for x in population]
+    pop_fitness = fitness(population)
+    best_index = int(np.argmax(pop_fitness))
+    best_solution = population[best_index]
+    best_fitness = pop_fitness[best_index]
+
+    return best_solution, best_fitness
+
+def multi_objective(fitness, population_size, budget):
+    # Initialisation
+    # array of size population_size that has an unknown k amount of elements that are included in each individual
+    population = generate_population(population_size, fitness.meta_data.n_variables)
+
+    # Loop
+    evaluations = 0
+    while evaluations < budget:
+        
+        # Selection
+        parents = selection_multi(population, fitness)
         evaluations += len(population)
 
         # Reproduction
         population = reproduction(parents, population_size)
 
         # Mutation
-        population = mutation(population)
-        #print("Test 1")
-        #print(len(population))
-        #print(len(population[0]))
+        mutation(population, 0.0001)
+        print(evaluations)
 
-
-    pop_fitness = [fitness(x) for x in population]
+    # Find the best combination
+    #pop_fitness = [fitness(x) for x in population]
+    pop_fitness = fitness(population)
     best_index = int(np.argmax(pop_fitness))
     best_solution = population[best_index]
     best_fitness = pop_fitness[best_index]
@@ -114,9 +142,8 @@ def single_objective(fitness, population_size, budget):
 
 def run_single_objective():
 
-    """"
-    fids = [2100, 2101, 2102, 2103, 2200, 2201, 2202, 2203]"""
-    fids = [2203]
+    fids = [2100, 2101, 2102, 2103, 2200, 2201, 2202, 2203]
+    #fids = [2100]
     problems = [
         get_problem(fid=fid, dimension = 50, instance = 1, problem_class = ProblemClass.GRAPH)
         for fid in fids
@@ -133,47 +160,47 @@ def run_single_objective():
     for prob in problems:
         prob.attach_logger(l)
         max = 0
-        for r in range(10):
-            res1, res2 = single_objective(prob, 51, 10000)
+        for r in range(30):
+            res1, res2 = single_objective(prob, 50, 10000)
             print(f"Run {r} on F{prob.meta_data.problem_id}: best fitness {res2}")
             if res2 > max:
                 max = res2
+            prob.reset()
         print("Overall Max: " + str(max))
 
     # This statemenet is necessary in case data is not flushed yet.
     del l
 
 def run_multi_objective():
+    fids = [2100, 2101, 2102, 2103, 2200, 2201, 2202, 2203]
+    #fids = [2203]
+    problems = [
+        get_problem(fid=fid, dimension = 50, instance = 1, problem_class = ProblemClass.GRAPH)
+        for fid in fids
+    ]
+
     # Create default logger compatible with IOHanalyzer
     # `root` indicates where the output files are stored.
     # `folder_name` is the name of the folder containing all output. You should compress this folder and upload it to IOHanalyzer
     l = logger.Analyzer(root="data", 
         folder_name="run", 
-        algorithm_name="Single-Objective EA", 
+        algorithm_name="Multi-Objective EA", 
         algorithm_info="30 instances of monotone submodular probleams with uniform constraint")
 
-    om = get_problem(fid = 2100, problem_class = ProblemClass.GRAPH)
-
-    om.attach_logger(l)
-    print (om.meta_data.n_variables)
-
+    for prob in problems:
+        prob.attach_logger(l)
+        max = 0
+        for r in range(30):
+            res1, res2 = multi_objective(prob, 50, 10000)
+            print(f"Run {r} on F{prob.meta_data.problem_id}: best fitness {res2}")
+            if res2 > max:
+                max = res2
+            prob.reset()
+        print("Overall Max: " + str(max))
 
     # This statemenet is necessary in case data is not flushed yet.
     del l
-    return 1
 
 if __name__ == "__main__":
-    run_single_objective()
+    run_multi_objective()
     
-    
-    """om = get_problem(fid = 2100, dimension=50, instance=1, problem_class = ProblemClass.GRAPH)
-
-    data = [0 for _ in range(om.meta_data.n_variables)]
-    data[0] = 1
-    print(om(data))
-
-    fitness = -1
-    while fitness <= 0:
-        x = np.random.randint(2, size = om.meta_data.n_variables)
-        fitness = om(x)
-    print(fitness)"""
