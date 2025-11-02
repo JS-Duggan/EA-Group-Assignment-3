@@ -3,6 +3,10 @@ from ioh import get_problem, ProblemClass, logger
 import numpy as np
 import random
 
+import multiprocessing
+from multiprocessing import Pool
+from multiprocessing import Lock
+import time
 
 def rls(func, budget=10_000, seed=None):
     """
@@ -136,6 +140,35 @@ def genetic_algorithm(func, budget=10_000, mu=20, lamb=40, seed=None):
 
     return best_f, best_x
 
+def wrapper(args):
+    pid, alg_func, alg_name, budget, runs = args
+    
+    l = logger.Analyzer(
+        root="data_ex1",  
+        folder_name=f"{alg_name}_runs",
+        algorithm_name=alg_name,
+        algorithm_info=f"Exercise 1 run for {alg_name}"
+    )
+    
+    problem = ioh.get_problem(pid, problem_class=ProblemClass.GRAPH)
+    problem.attach_logger(l)
+    # print(f"  Problem: {problem.meta_data.name} (ID: {pid})")
+    
+    
+    
+    for r in range(runs):
+        checkpoint = time.perf_counter()
+
+        seed = (pid * runs) + r 
+
+        alg_func(problem, budget=budget, seed=seed)
+        
+        if (r + 1) % 10 == 0:
+            print(f"    ... completed run {r+1}/{runs}")
+        
+        problem.reset()
+        
+        print(f"Run time (s): {time.perf_counter() - checkpoint:.2f}")
 
 # -------- Driver Code ----------
 def run_exercise_1():
@@ -155,46 +188,65 @@ def run_exercise_1():
     }
     
 
-    budget = 10_000
+    budget = 100_000
     n_runs = 30
+    
+    num_workers = multiprocessing.cpu_count()
+    runs_per_worker = n_runs // num_workers
+    extra_runs = n_runs % num_workers
     
     # --- Run Experiment ---
     for alg_name, alg_func in algorithms.items():
         print(f"\n--- Running Algorithm: {alg_name} ---")
         
 
-        l = logger.Analyzer(
-            root="data_ex1",  
-            folder_name=f"{alg_name}_runs",
-            algorithm_name=alg_name,
-            algorithm_info=f"Exercise 1 run for {alg_name}"
-        )
+        # l = logger.Analyzer(
+        #     root="data_ex1",  
+        #     folder_name=f"{alg_name}_runs",
+        #     algorithm_name=alg_name,
+        #     algorithm_info=f"Exercise 1 run for {alg_name}"
+        # )
         
         for pid in problem_ids:
             try:
+                checkpoint = time.perf_counter()
 
                 problem = ioh.get_problem(pid, problem_class=ProblemClass.GRAPH)
-                problem.attach_logger(l)
+                # problem.attach_logger(l)
                 print(f"  Problem: {problem.meta_data.name} (ID: {pid})")
                 
-                for r in range(n_runs):
+                
+                all_tasks = []
+                for i in range(num_workers):
+                    runs = runs_per_worker + (1 if i < extra_runs else 0)
+                    if runs > 0:
+                        all_tasks.append((pid, alg_func, alg_name, budget, runs))
+                        
+                with Pool(processes=num_workers) as pool:
+                    pool.map(wrapper, all_tasks)
+                    
+                
+                print(f"Total time (s): {time.perf_counter() - checkpoint:.2f}")
+                
+                # for r in range(n_runs):
+                #     print(r)
 
-                    seed = (pid * n_runs) + r 
+                #     seed = (pid * n_runs) + r 
                     
 
-                    alg_func(problem, budget=budget, seed=seed)
+                #     alg_func(problem, budget=budget, seed=seed)
                     
-                    if (r + 1) % 10 == 0:
-                        print(f"    ... completed run {r+1}/{n_runs}")
+                #     if (r + 1) % 10 == 0:
+                #         print(f"    ... completed run {r+1}/{n_runs}")
                     
 
-                    problem.reset() 
+                #     problem.reset() 
                         
             except Exception as e:
                 print(f"    ERROR running {alg_name} on {pid}: {e}")
         
         print(f"--- Finished {alg_name} ---")
-        del l 
+        # del l 
 
     print("\nAll algorithms Exercise 1 completed.")
     print(f"Data saved to 'data_ex1' directory.")
