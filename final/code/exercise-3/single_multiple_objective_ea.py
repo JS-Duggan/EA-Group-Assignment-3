@@ -129,7 +129,6 @@ def multi_objective(fitness, population_size, budget):
 
         # Mutation
         mutation(population, 0.0001)
-        print(evaluations)
 
     # Find the best combination
     #pop_fitness = [fitness(x) for x in population]
