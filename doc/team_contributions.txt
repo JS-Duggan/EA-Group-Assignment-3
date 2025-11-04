@@ -1,5 +1,7 @@
 Blaschka, Liam (a1888420)
-Exercise 
+- Exercise 4 with exercise 1 and 2 algorithms
+- Added multi-processing to exercise 1 and 2 code, enabling 
+large 100,000 budget runs to be ran in parallel
 
 Dash Tanu, Mohon (a1918614)
 Exercise 
