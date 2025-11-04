@@ -5,7 +5,7 @@ pids = [2100, 2101, 2102, 2103, 2200, 2201, 2202, 2203, 2300, 2301, 2302]
 
 for pid in pids:
 
-    df = pd.read_csv(f"ex2-10_000/{pid}_GSEMO_tradeoff_first_run.csv")
+    df = pd.read_csv(f"data/{pid}_GSEMO_tradeoff_first_run.csv")
 
     x = df["size"]
     y = df["value_f"]
@@ -16,7 +16,7 @@ for pid in pids:
 
     plt.xlabel("Size")
     plt.ylabel("Function value")
-    plt.title(f"F{pid} GSEMO First Run Trade-off (10,000 budget)")
+    plt.title(f"F{pid} GSEMO First Run Trade-off (100,000 budget)")
     plt.grid(True, linestyle="--", alpha=0.5)
     plt.legend()
     plt.tight_layout()
