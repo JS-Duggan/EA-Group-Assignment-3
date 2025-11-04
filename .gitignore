@@ -1,1 +1,7 @@
-*/env/*
+
+.venv/
+.venv311/
+venv/
+env/
+
+.DS_Store
