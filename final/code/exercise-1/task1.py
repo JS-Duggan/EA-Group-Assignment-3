@@ -151,10 +151,7 @@ def wrapper(args):
     )
     
     problem = ioh.get_problem(pid, problem_class=ProblemClass.GRAPH)
-    problem.attach_logger(l)
-    # print(f"  Problem: {problem.meta_data.name} (ID: {pid})")
-    
-    
+    problem.attach_logger(l)    
     
     for r in range(runs):
         checkpoint = time.perf_counter()
@@ -199,54 +196,29 @@ def run_exercise_1():
     for alg_name, alg_func in algorithms.items():
         print(f"\n--- Running Algorithm: {alg_name} ---")
         
-
-        # l = logger.Analyzer(
-        #     root="data_ex1",  
-        #     folder_name=f"{alg_name}_runs",
-        #     algorithm_name=alg_name,
-        #     algorithm_info=f"Exercise 1 run for {alg_name}"
-        # )
-        
         for pid in problem_ids:
             try:
                 checkpoint = time.perf_counter()
 
                 problem = ioh.get_problem(pid, problem_class=ProblemClass.GRAPH)
-                # problem.attach_logger(l)
                 print(f"  Problem: {problem.meta_data.name} (ID: {pid})")
                 
-                
+                # Run in parallel with multi-processing
                 all_tasks = []
                 for i in range(num_workers):
                     runs = runs_per_worker + (1 if i < extra_runs else 0)
                     if runs > 0:
                         all_tasks.append((pid, alg_func, alg_name, budget, runs))
-                        
                 with Pool(processes=num_workers) as pool:
                     pool.map(wrapper, all_tasks)
                     
                 
                 print(f"Total time (s): {time.perf_counter() - checkpoint:.2f}")
-                
-                # for r in range(n_runs):
-                #     print(r)
-
-                #     seed = (pid * n_runs) + r 
-                    
-
-                #     alg_func(problem, budget=budget, seed=seed)
-                    
-                #     if (r + 1) % 10 == 0:
-                #         print(f"    ... completed run {r+1}/{n_runs}")
-                    
-
-                #     problem.reset() 
                         
             except Exception as e:
                 print(f"    ERROR running {alg_name} on {pid}: {e}")
         
         print(f"--- Finished {alg_name} ---")
-        # del l 
 
     print("\nAll algorithms Exercise 1 completed.")
     print(f"Data saved to 'data_ex1' directory.")
