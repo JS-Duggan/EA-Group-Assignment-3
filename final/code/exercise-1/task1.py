@@ -5,7 +5,6 @@ import random
 
 import multiprocessing
 from multiprocessing import Pool
-from multiprocessing import Lock
 import time
 
 def rls(func, budget=10_000, seed=None):
