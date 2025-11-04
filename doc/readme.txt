@@ -4,7 +4,14 @@
 
 
 ## Exercise 2
-
+To run the GSEMO algorithm, run
+```bash
+python3 final/code/exercise-2/run_gsemo.py --budget 10_000
+```
+To plot the trade-offs of the first run for the GSEMO algorithm, ensure the title on line 22 specifies a budget of 10,000 then run
+```bash
+python3 final/code/exercise-2/plot_tradeoffs.py
+```
 
 ## Exercise 3
 To run the signal objective instance method, use:
