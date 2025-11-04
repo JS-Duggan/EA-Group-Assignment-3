@@ -13,6 +13,7 @@ To plot the trade-offs of the first run for the GSEMO algorithm, ensure the titl
 python3 final/code/exercise-2/plot_tradeoffs.py
 ```
 
+
 ## Exercise 3
 To run the signal objective instance method, use:
 ```bash
