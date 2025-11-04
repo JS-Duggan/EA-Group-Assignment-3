@@ -165,25 +165,17 @@ def main():
         
         checkpoint = time.perf_counter()
         
+        # Run in parallel with multi-processing
         all_tasks = []
         for i in range(num_workers):
             runs = runs_per_worker + (1 if i < extra_runs else 0)
             if runs > 0:
                 all_tasks.append((pid, args.budget, runs, out_dir))
-       
         with Pool(processes=num_workers) as pool:
             pool.map(wrapper, all_tasks)
             
-        
         print(f"Total time (s): {time.perf_counter() - checkpoint:.2f}")
-        
-        
-        # info = run_gsemo_on_problem(pid, args.budget, args.runs, out_dir)
-        # meta.append(info)
 
-    # import json
-    # with open(out_dir / "meta.json", "w", encoding="utf-8") as jf:
-    #     json.dump(meta, jf, indent=2)
 
 if __name__ == "__main__":
     main()
