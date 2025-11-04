@@ -184,7 +184,7 @@ def run_exercise_1():
     }
     
 
-    budget = 100_000
+    budget = 10_000
     n_runs = 30
     
     num_workers = multiprocessing.cpu_count()
@@ -224,3 +224,4 @@ def run_exercise_1():
 
 if __name__ == "__main__":
     run_exercise_1()
+
