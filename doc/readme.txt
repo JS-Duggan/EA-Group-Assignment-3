@@ -1,6 +1,11 @@
 # How to run
 
 ## Exercise 1
+Run
+```bash
+python3 final/code/exercise-1/task1.py
+```
+The data_ex1 folder contains all the raw data for IOHanalyzer
 
 
 ## Exercise 2

@@ -1,0 +1,4 @@
+"ID","DIM","funcId","runs","best reached","succ","budget","max evals used","worst recorded","worst reached","mean reached","median reached"
+"GA",450,2101,30,432,1,10000,9944,-237,411,422.4,422
+"OnePlusOne_EA",450,2101,30,428,1,10000,9873,-237,408,419.2,418.5
+"RLS",450,2101,30,405,1,10000,1726,-237,353,385,385.5
