@@ -16,7 +16,7 @@ For the PackWhileTravel problem instances, the GSEMO algorithm generally perform
 In most of the PackWhileTravel instances, the GSEMO algorithm initially had a significantly better solutions than the other algorithms, though its improvement from its starting point was minimal and slow, allowing the other algorithms to surpass its performance within the 10,000 evaltuions. However, for problem F2302 GSEMO was significantly worse than the other algorithms for the entireity of the 10,000 evaluations budget, and still suffered from minimal and slow improvement while the algorithms of exercise 1 found significantly larger improvements.
 
 
-# Summary
+# Performance Summary
 
 The GSEMO algorithm was comprehensively better performing for all of the MaxCoverage and MaxInfluence problem instances, though GSEMO generally performed the worst for the PackWhileTravel problem instances. For the MaxCoverage problems, all algorithms were generally able to converge within the 10,000 evaluations budget; GSEMO converged fastest in all problems MaxCoverage problems. For the MaxInfluence problems, the GSEMO algorithm had an even greater gap of better perforamnce above the algorithms from exercise 1; none of the algorithms converged for the MaxInfluence problems within the 10,000 evaluations budget. The GSEMO algorithm was generally the worst performing algorithm for the PackWhileTravel problems (except for F2300 where it matched RLS), however, it generally started with significantly better solutions at early evaluations compared to the other algorithms, before being surpassed by RLS, (1+1) EA, and GA in later evaluations, with the exception of F2302 where GSEMO was significantly worse for all of the budget.
 
